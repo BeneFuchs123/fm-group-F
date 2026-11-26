@@ -84,9 +84,9 @@ groups; the 70/30 target is not applied to these sums. Country groups follow
 the current iShares index holdings, with an immaterial residual Russian
 Federation position excluded from the EM roster.
 
-[Finanzfluss describes 70/30](https://www.finanzfluss.de/etf/portfolio/70-30/)
-as an approximate GDP-oriented allocation but does not specify a GDP basis or
-publish a calculation. The IMF comparison therefore reports both PPP GDP and
+The project evaluates the fixed 70/30 allocation against GDP and
+market-capitalization data. Because the estimated emerging-market share
+depends on the GDP measure, the IMF comparison reports both PPP GDP and
 nominal GDP in current U.S. dollars. The
 trend chart shows both EM GDP shares from 2015 to 2025 against the fixed 30%
 portfolio target. Current country groups are held constant across the series;

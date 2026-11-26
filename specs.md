@@ -11,8 +11,10 @@ reproducible presentation of the analysis.
 
 The strategy combines developed-market equities through URTH (iShares MSCI
 World ETF) with emerging-market equities through EEM (iShares MSCI Emerging
-Markets ETF). The 70/30 allocation is a fixed policy choice informed by the
-common GDP-oriented 70/30 approach described by Finanzfluss. It is not
+Markets ETF). The analysis evaluates a fixed 70/30 allocation as a deliberate
+regional balance: it retains a majority allocation to developed markets while
+giving emerging markets a substantial portfolio share. IMF GDP data are used
+to assess the economic context for this target. The allocation is not
 calculated dynamically from GDP or market capitalization, and the analysis
 does not establish that 30% is an optimal allocation.
 
