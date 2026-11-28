@@ -211,9 +211,8 @@ equivalent to MSCI free-float-adjusted investable capitalization.
   exposures.
 - [`world_em_backtest.py`](./world_em_backtest.py) contains the main
   backtest logic as a Python script.
-- [`regional_weighting_analysis.py`](./regional_weighting_analysis.py)
-  provides separate supplemental country and sector holdings snapshots; it
-  requires the local source files described in the README.
+- [`requirements.txt`](./requirements.txt) lists the dependencies for the
+  local Python backtest.
 
 Run the notebook from top to bottom in Google Colab or Jupyter. Its setup cell
 installs `yfinance`. The notebook retrieves price, Treasury, GDP, market-cap,
@@ -223,12 +222,6 @@ locally, install the requirements:
 ```bash
 python -m pip install -r requirements.txt
 python world_em_backtest.py
-```
-
-The optional local holdings-snapshot script can be run separately with:
-
-```bash
-python regional_weighting_analysis.py
 ```
 
 All notebook API downloads require an internet connection.

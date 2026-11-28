@@ -1,120 +1,58 @@
 # FM2270 Financial Modelling Group Project
 
-Backtest of a portfolio invested 70% in URTH (iShares MSCI World ETF) and 30%
-in EEM (iShares MSCI Emerging Markets ETF), compared with ACWI as a broad
-global equity-market benchmark.
+The project backtests a portfolio invested 70% in URTH (iShares MSCI World ETF)
+and 30% in EEM (iShares MSCI Emerging Markets ETF). ACWI is the broad global
+equity benchmark.
 
-## Files
+## Run the notebook in Google Colab
 
-- `world_em_backtest.ipynb` — interactive notebook with calculations and charts.
-- `world_em_backtest.py` — Python script containing the main backtest logic, organized into VS Code/Jupyter cells. The notebook also includes the regional analysis section.
-- `regional_weighting_analysis.py` — compares current iShares country holdings with IMF GDP and World Bank/WFE market-cap data.
+1. Open [world_em_backtest.ipynb in Colab](https://colab.research.google.com/github/BeneFuchs123/fm-group-F/blob/main/world_em_backtest.ipynb).
+   You can also upload `world_em_backtest.ipynb` from your computer.
+2. Select **Runtime > Run all**. The setup cell installs `yfinance`.
+3. Use the tables and figures from that run in the prospectus.
 
-## Run
+The notebook is self-contained and requires an internet connection. It fetches
+ETF prices from Yahoo Finance, 3-month US Treasury yields from FRED, GDP from
+IMF DataMapper, listed-company market capitalization from the World Bank, and
+dated ETF holdings from iShares. The notebook is the only project file needed
+in Colab.
 
-Install the requirements, then run the backtest from the notebook or script:
+## What the notebook produces
+
+The backtest uses adjusted daily closing prices from January 2015 through
+October 2026. It compares annual rebalancing and buy-and-hold with ACWI.
+The 2026 calendar-year return covers the period through October 30.
+The performance tables show annualized arithmetic return, CAGR, volatility,
+Sharpe ratio, maximum drawdown, tracking error, information ratio, alpha,
+and beta. The primary Sharpe ratio uses the FRED Treasury yield. Annualized
+alpha is the daily excess-return regression intercept multiplied by 252.
+Beta is the slope of the daily regression. The backtest excludes trading
+costs, taxes, and ongoing contributions.
+
+The regional analysis produces four figures:
+
+- The emerging-market share of nominal and purchasing-power-adjusted GDP from
+  2015 to 2025, with the 30% target as a reference.
+- A comparison of emerging-market portfolio weights with 2025 GDP and
+  World Bank/WFE listed-company market-cap shares.
+- A comparison of the largest country equity exposures in the 70/30
+  portfolio, ACWI, and MSCI World (URTH), with a full country table.
+- A comparison of equity sector exposures for the same three portfolios,
+  with a full sector table.
+
+The country and sector comparisons use the November 25, 2026 holdings
+snapshot. The GDP trend uses a fixed set of countries, and the World Bank
+market-cap comparison reports which share of each country group has data.
+[specs.md](./specs.md) explains the rationale, methodology, and limitations.
+
+## Run the backtest as a Python script
+
+Use Python 3.10 or newer to run the backtest calculations and performance
+charts locally.
 
 ```bash
 python -m pip install -r requirements.txt
-```
-
-Use Python 3.10 or newer.
-
-Open `world_em_backtest.ipynb` and run all cells, or run the backtest script:
-
-```bash
 python world_em_backtest.py
 ```
 
-The notebook downloads adjusted closing prices from Yahoo Finance for
-January 2015 through October 2026. It models annual rebalancing at calendar
-year boundaries, and also shows a 70/30 buy-and-hold portfolio for comparison.
-The primary Sharpe ratio uses a date-matched 3-month U.S. Treasury yield from
-FRED; a zero-risk-free-rate Sharpe ratio is included as a sensitivity check.
-The performance table reports annualized arithmetic average return separately
-from CAGR. Alpha is the annualized intercept from a daily excess-return
-regression against ACWI, using the FRED rate; beta is the regression slope and
-is not annualized. The annualized alpha uses daily alpha multiplied by 252.
-Transaction costs, taxes, and ongoing contributions are not modelled. The final
-2026 calendar-year return is partial, through October 30.
-
-ACWI is used as the broad market benchmark. A separate 70/30 benchmark made
-from the same ETFs and rebalanced on the same schedule would reproduce the
-strategy rather than provide an independent comparison.
-
-The code includes cumulative growth, portfolio-versus-benchmark performance,
-drawdowns, rolling volatility, return correlations, rolling correlations,
-portfolio weights, calendar-year returns, the required performance metrics,
-and a daily excess-return regression chart for the rebalanced strategy. Its
-regional-context section downloads IMF GDP and World Bank market-cap data
-through their public APIs and uses a fixed country roster from the dated
-iShares holdings snapshot. The notebook does not read local project data files
-or invoke another project script.
-
-The notebook retrieves URTH, EEM, and ACWI holdings dated November 25, 2026
-directly from the iShares API. It compares the 70/30 target allocation with
-ACWI and MSCI World (URTH) by region, country, and sector, and puts the
-emerging-market allocations alongside IMF GDP and World Bank/WFE market-cap
-shares.
-
-The supplied example notebook uses a different allocation: 50% SSAC.L and 50%
-ACWD.L, with ACWU.L as its benchmark. These are all MSCI ACWI-tracking funds,
-so that example mainly compares ETF implementations of the same broad index;
-it is not the 70/30 World/Emerging Markets strategy. Its hard-coded allocation
-charts do not come from its price backtest. The current notebook compares the
-70/30 portfolio with ACWI.
-
-Historical results are illustrative and do not predict future performance.
-
-## Regional weighting comparison
-
-Run the regional analysis from the project directory:
-
-```bash
-python regional_weighting_analysis.py
-```
-
-This supplemental script reads the supplied iShares World and Emerging Markets
-holdings exports and the locally downloaded IMF and World Bank datasets. It
-writes the
-country-level equity exposure for a 70/30 combination to
-`portfolio_country_exposure.csv`, a source/coverage summary to
-`regional_weighting_summary.csv`, country-level input data to
-`regional_country_data.csv`, and a comparison chart to
-`regional_weighting_comparison.png`. The IMF GDP share time series is saved to
-`gdp_share_trend.csv` and visualized in `gdp_share_trend.png`. Current sector
-exposures are saved as `portfolio_sector_exposure.csv`; country and sector
-charts are saved as `portfolio_country_allocation.png` and
-`portfolio_sector_allocation.png`. These local-input outputs are not needed to
-run the notebook. The notebook independently reproduces the GDP trend,
-regional market-cap comparison, and holdings exposures through the IMF,
-World Bank, and iShares APIs.
-
-The ETF holdings are dated November 25, 2026. Country weights in
-`portfolio_country_exposure.csv` use the 70/30 target and iShares' reported
-holding weights. Separately, GDP and market-cap shares are calculated by
-summing country data across the MSCI World and MSCI Emerging Markets country
-groups; the 70/30 target is not applied to these sums. Country groups follow
-the current iShares index holdings, with an immaterial residual Russian
-Federation position excluded from the EM roster.
-
-The project evaluates the fixed 70/30 allocation against GDP and
-market-capitalization data. Because the estimated emerging-market share
-depends on the GDP measure, the IMF comparison reports both PPP GDP and
-nominal GDP in current U.S. dollars. The
-trend chart shows both EM GDP shares from 2015 to 2025 against the fixed 30%
-portfolio target. Current country groups are held constant across the series;
-this is a descriptive comparison, not a historical reclassification or
-portfolio backtest. The latest WEO observations may include estimates.
-
-The country and sector charts adapt the holdings-based exhibits in the Group
-AL report using the current 70/30 ETF holdings. They are a snapshot dated
-November 25, 2026, not historical allocation charts. Performance, drawdown,
-volatility, correlation, and portfolio-weight plots remain in the backtest
-notebook; only exhibits that can be supported by this strategy's data are
-included.
-2025 World Bank/WFE market-cap comparison is coverage-limited because the
-download has missing country observations. Its listed-domestic-company values
-are not the same as MSCI's free-float-adjusted investable market capitalization.
-Use these results as rationale and context, not as evidence that 30% is the
-uniquely correct allocation.
+Use the notebook for the regional comparisons and the prospectus figures.
