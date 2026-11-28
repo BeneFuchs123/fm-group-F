@@ -31,8 +31,12 @@ January 2015 through October 2026. It models annual rebalancing at calendar
 year boundaries, and also shows a 70/30 buy-and-hold portfolio for comparison.
 The primary Sharpe ratio uses a date-matched 3-month U.S. Treasury yield from
 FRED; a zero-risk-free-rate Sharpe ratio is included as a sensitivity check.
+The performance table reports annualized arithmetic average return separately
+from CAGR. Alpha is the annualized intercept from a daily excess-return
+regression against ACWI, using the FRED rate; beta is the regression slope and
+is not annualized. The annualized alpha uses daily alpha multiplied by 252.
 Transaction costs, taxes, and ongoing contributions are not modelled. The final
-2026 calendar-year return is partial, through October 31.
+2026 calendar-year return is partial, through October 30.
 
 ACWI is used as the broad market benchmark. A separate 70/30 benchmark made
 from the same ETFs and rebalanced on the same schedule would reproduce the
@@ -40,18 +44,23 @@ strategy rather than provide an independent comparison.
 
 The code includes cumulative growth, portfolio-versus-benchmark performance,
 drawdowns, rolling volatility, return correlations, rolling correlations,
-portfolio weights, calendar-year returns, and performance metrics. Price
-history alone cannot produce historical sector or country allocations. The
-notebook's final section instead displays current holdings snapshots from the
-provided iShares files, clearly distinguished from backtest-period results.
+portfolio weights, calendar-year returns, the required performance metrics,
+and a daily excess-return regression chart for the rebalanced strategy. Its
+regional-context section downloads IMF GDP and World Bank market-cap data
+through their public APIs and uses a fixed country roster from the dated
+iShares holdings snapshot. The notebook does not read local project data files
+or invoke another project script.
+
+The notebook retrieves URTH and EEM holdings dated November 25, 2026 directly
+from the iShares API and produces country and sector tables and charts for
+the 70/30 target allocation.
 
 The supplied example notebook uses a different allocation: 50% SSAC.L and 50%
 ACWD.L, with ACWU.L as its benchmark. These are all MSCI ACWI-tracking funds,
 so that example mainly compares ETF implementations of the same broad index;
 it is not the 70/30 World/Emerging Markets strategy. Its hard-coded allocation
 charts do not come from its price backtest. The current notebook compares the
-70/30 portfolio with ACWI and uses the supplied current iShares holdings for
-its separate country and sector snapshots.
+70/30 portfolio with ACWI.
 
 Historical results are illustrative and do not predict future performance.
 
@@ -63,8 +72,9 @@ Run the regional analysis from the project directory:
 python regional_weighting_analysis.py
 ```
 
-It reads the supplied iShares World and Emerging Markets holdings exports, the
-IMF WEO dataset, and the World Bank market-cap download. It writes the
+This supplemental script reads the supplied iShares World and Emerging Markets
+holdings exports and the locally downloaded IMF and World Bank datasets. It
+writes the
 country-level equity exposure for a 70/30 combination to
 `portfolio_country_exposure.csv`, a source/coverage summary to
 `regional_weighting_summary.csv`, country-level input data to
@@ -73,8 +83,10 @@ country-level equity exposure for a 70/30 combination to
 `gdp_share_trend.csv` and visualized in `gdp_share_trend.png`. Current sector
 exposures are saved as `portfolio_sector_exposure.csv`; country and sector
 charts are saved as `portfolio_country_allocation.png` and
-`portfolio_sector_allocation.png`. The notebook's final section runs this
-analysis and displays these charts alongside the GDP visualizations.
+`portfolio_sector_allocation.png`. These local-input outputs are not needed to
+run the notebook. The notebook independently reproduces the GDP trend,
+regional market-cap comparison, and holdings exposures through the IMF,
+World Bank, and iShares APIs.
 
 The ETF holdings are dated November 25, 2026. Country weights in
 `portfolio_country_exposure.csv` use the 70/30 target and iShares' reported

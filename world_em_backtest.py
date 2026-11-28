@@ -51,6 +51,7 @@ raw = yf.download(
     end=END_DATE,
     auto_adjust=True,
     progress=False,
+    threads=False,
 )
 
 if raw.empty:
@@ -200,6 +201,43 @@ strategy_weights = pd.concat([initial_weights_row, strategy_weights])
 buy_and_hold_weights = pd.concat([initial_weights_row, buy_and_hold_weights])
 
 # %%
+def market_model_metrics(
+    portfolio_returns: pd.Series,
+    benchmark_returns: pd.Series,
+    risk_free_returns: pd.Series,
+) -> tuple[float, float, pd.Series, pd.Series]:
+    """Return annualized CAPM alpha, beta, and aligned daily excess returns."""
+    aligned_returns = pd.concat(
+        [
+            portfolio_returns.rename("portfolio"),
+            benchmark_returns.rename("benchmark"),
+            risk_free_returns.rename("risk_free"),
+        ],
+        axis="columns",
+        sort=False,
+    ).dropna()
+    if len(aligned_returns) < 2:
+        raise ValueError("At least two aligned return observations are required for alpha and beta.")
+
+    portfolio_excess_returns = aligned_returns["portfolio"] - aligned_returns["risk_free"]
+    benchmark_excess_returns = aligned_returns["benchmark"] - aligned_returns["risk_free"]
+    benchmark_variance = benchmark_excess_returns.var(ddof=1)
+    if not np.isfinite(benchmark_variance) or benchmark_variance <= 0:
+        raise ValueError("Benchmark excess returns must have positive variance to calculate beta.")
+
+    beta = float(portfolio_excess_returns.cov(benchmark_excess_returns) / benchmark_variance)
+    daily_alpha = float(
+        portfolio_excess_returns.mean() - beta * benchmark_excess_returns.mean()
+    )
+    annualized_alpha = daily_alpha * TRADING_DAYS_PER_YEAR
+    return (
+        annualized_alpha,
+        beta,
+        portfolio_excess_returns,
+        benchmark_excess_returns,
+    )
+
+
 def performance_metrics(equity_curve: pd.Series, benchmark: pd.Series | None = None) -> pd.Series:
     returns = equity_curve.pct_change().dropna()
     years = (equity_curve.index[-1] - equity_curve.index[0]).days / 365.25
@@ -230,6 +268,7 @@ def performance_metrics(equity_curve: pd.Series, benchmark: pd.Series | None = N
     metrics = {
         "Cumulative return": equity_curve.iloc[-1] / equity_curve.iloc[0] - 1,
         "CAGR": (equity_curve.iloc[-1] / equity_curve.iloc[0]) ** (1 / years) - 1,
+        "Annualized average return (arithmetic)": returns.mean() * TRADING_DAYS_PER_YEAR,
         "Annualized volatility": daily_volatility * np.sqrt(TRADING_DAYS_PER_YEAR),
         "Sharpe ratio (3-month Treasury)": sharpe_ratio,
         "Sharpe ratio (0% risk-free sensitivity)": zero_risk_free_sharpe,
@@ -251,6 +290,13 @@ def performance_metrics(equity_curve: pd.Series, benchmark: pd.Series | None = N
             if active_returns.std(ddof=1) > 0
             else np.nan
         )
+        annualized_alpha, beta, _, _ = market_model_metrics(
+            returns,
+            benchmark.pct_change().dropna(),
+            daily_risk_free_returns,
+        )
+        metrics["Alpha (annualized, vs. ACWI)"] = annualized_alpha
+        metrics["Beta (vs. ACWI)"] = beta
 
     return pd.Series(metrics)
 
@@ -266,10 +312,12 @@ metrics = pd.DataFrame(
 percentage_metrics = [
     "Cumulative return",
     "CAGR",
+    "Annualized average return (arithmetic)",
     "Annualized volatility",
     "Maximum drawdown",
     "Annualized active return",
     "Tracking error",
+    "Alpha (annualized, vs. ACWI)",
 ]
 formatted_metrics = metrics.astype(object)
 for metric in percentage_metrics:
@@ -281,6 +329,7 @@ for metric in [
     "Sharpe ratio (3-month Treasury)",
     "Sharpe ratio (0% risk-free sensitivity)",
     "Information ratio",
+    "Beta (vs. ACWI)",
 ]:
     if metric in metrics.index:
         formatted_metrics.loc[metric] = metrics.loc[metric].map(
@@ -288,7 +337,55 @@ for metric in [
         )
 
 print("Performance metrics (primary Sharpe uses the daily 3-month Treasury yield):")
-print(formatted_metrics)
+print(formatted_metrics.to_string())
+
+# %%
+# The fitted line shows daily alpha in percent at x=0 and beta as its slope.
+annualized_alpha, beta, strategy_excess_returns, benchmark_excess_returns = (
+    market_model_metrics(
+        strategy_returns,
+        benchmark_returns,
+        daily_risk_free_returns,
+    )
+)
+fig, ax = plt.subplots()
+ax.scatter(
+    benchmark_excess_returns * 100,
+    strategy_excess_returns * 100,
+    alpha=0.25,
+    s=12,
+    label="70/30 Annual Rebalance",
+)
+x_line = np.linspace(
+    benchmark_excess_returns.min(),
+    benchmark_excess_returns.max(),
+    100,
+)
+ax.plot(
+    x_line * 100,
+    (annualized_alpha / TRADING_DAYS_PER_YEAR + beta * x_line) * 100,
+    color="tab:red",
+    linewidth=2,
+    label=f"OLS fit: alpha {annualized_alpha:.2%}/year; beta {beta:.2f}",
+)
+ax.set_title("Daily Excess Returns: 70/30 Annual Rebalance vs. MSCI ACWI")
+ax.set_xlabel("MSCI ACWI excess return per trading day (%)")
+ax.set_ylabel("70/30 portfolio excess return per trading day (%)")
+ax.legend()
+fig.text(
+    0.5,
+    0.01,
+    (
+        "Sources: Yahoo Finance adjusted ETF prices and FRED DGS3MO; "
+        f"{strategy_excess_returns.index.min().date()} to "
+        f"{strategy_excess_returns.index.max().date()}. "
+        "Alpha = daily OLS intercept x 252; beta is not annualized."
+    ),
+    ha="center",
+    fontsize=9,
+)
+fig.tight_layout(rect=(0, 0.06, 1, 1))
+plt.show()
 
 # %%
 # Cumulative growth of $1 in each ETF and the broad-market benchmark.

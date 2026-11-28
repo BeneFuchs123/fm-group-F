@@ -48,6 +48,34 @@ the portfolio remains considerably exposed to the United States. The EM
 allocation broadens regional exposure; it does not create an equal regional
 weighting or remove US concentration.
 
+## Target investors and investment horizon
+
+The strategy is designed for individual investors seeking long-term capital
+growth through the equity portion of a diversified portfolio. Its intended
+investors have the financial capacity and willingness to absorb substantial
+losses, have no planned near-term withdrawals from this allocation, and
+deliberately want more emerging-market exposure than a broad market-weighted
+portfolio such as ACWI. URTH spreads the majority allocation across developed
+markets, while EEM provides exposure to emerging-market equities through a
+single fund. Annual rebalancing maintains the intended regional allocation
+over time.
+
+The intended investment horizon is at least 10 years. This is a planning
+assumption based on the strategy's all-equity exposure and the investor's
+ability to stay invested through prolonged downturns. Losses remain possible
+even over that horizon. The rebalanced portfolio fell 33.50% from peak to
+trough and had a beta of 1.01 against ACWI in the sample, indicating broad
+equity-market sensitivity
+despite the different regional weights. Its historical CAGR of 9.84% also
+trailed ACWI's 10.74%, so an investor should be willing to tolerate periods of
+benchmark underperformance to maintain the chosen emerging-market exposure.
+
+Emerging-market holdings bring additional political, regulatory, liquidity,
+and currency risks. The analysis measures performance in USD, so investors
+with spending needs in another currency also face exchange-rate effects on
+their realized returns. The strategy assumes investors can cover near-term
+spending from other assets.
+
 ## Portfolio and benchmark rules
 
 - **World allocation:** 70% URTH.
@@ -83,11 +111,23 @@ risk-free-rate Sharpe ratio is also reported as a sensitivity check. The
 Treasury yield is a proxy for a risk-free return, not a directly invested
 daily Treasury total-return series.
 
-The analysis reports cumulative return, CAGR, annualized volatility, Sharpe
-ratio, maximum drawdown, annualized active return, tracking error, and
-information ratio. It also includes cumulative-growth, drawdown, rolling
-volatility, correlation, portfolio-weight, and calendar-year-return
-visualizations.
+The analysis reports cumulative return, CAGR, annualized arithmetic average
+return, annualized volatility, Sharpe ratio, maximum drawdown, annualized
+active return, tracking error, information ratio, alpha, and beta. The
+arithmetic average return is the mean daily return multiplied by 252 and is
+reported separately from geometric CAGR.
+
+Alpha and beta are estimated from aligned daily excess returns using an OLS
+market model against ACWI: portfolio excess return is regressed on ACWI excess
+return, with both excess returns measured over the date-matched FRED DGS3MO
+rate. Alpha is the daily intercept multiplied by 252; beta is the regression
+slope and is not annualized. Alpha and beta are not shown for ACWI itself,
+which is the reference portfolio. These estimates are sample-dependent and
+are not forecasts.
+
+Visualizations include cumulative growth, drawdown, rolling volatility,
+correlation, portfolio weights, calendar-year returns, and the daily excess
+return regression for the rebalanced strategy.
 
 ## Historical results
 
@@ -102,18 +142,44 @@ For the validated run from January 2, 2015, through October 30, 2026:
 - ACWI had a CAGR of **10.74%**, annualized volatility of **16.87%**, maximum
   drawdown of **−33.53%**, and 3-month-Treasury Sharpe ratio of **0.56**.
 
-The 70/30 strategy underperformed ACWI over this sample period on both CAGR
-and Sharpe ratio. This is an observed historical result, not evidence that
-emerging markets alone caused the difference. A formal performance
-attribution would be required to quantify the contribution of each allocation
-and of rebalancing.
+The annualized arithmetic average returns were **10.92%** for the rebalanced
+70/30 portfolio, **11.03%** for buy-and-hold, and **11.65%** for ACWI. The
+market-model estimates against ACWI were an annualized alpha of **−0.86%** and
+beta of **1.01** for the rebalanced portfolio, and an annualized alpha of
+**−0.73%** and beta of **1.01** for buy-and-hold. Alpha is the annualized daily
+regression intercept; beta is not annualized. ACWI is the reference and is
+therefore not assigned alpha or beta against itself.
+
+The arithmetic average returns are higher than the corresponding CAGRs because
+the arithmetic measure annualizes the average daily return without accounting
+for compounding and volatility drag. The rebalanced portfolio's beta of 1.01
+indicates approximately one-for-one historical sensitivity to ACWI's daily
+excess returns. Its negative alpha of −0.86% per year indicates that its
+average return was below the one-factor market-model estimate after accounting
+for that exposure. Buy-and-hold shows a similar beta and a negative alpha of
+−0.73% per year.
+
+The 70/30 strategy underperformed ACWI over this sample period on CAGR, Sharpe
+ratio, and estimated alpha. These are sample-period observations, not
+forecasts or proof that emerging markets alone caused the difference. A
+formal performance attribution would be required to quantify the contribution
+of each allocation and of rebalancing.
 
 ## Regional and sector exhibits
 
-The regional analysis combines the November 25, 2026 iShares holdings using
-the 70/30 target to estimate current country and sector exposures. These are
-holdings snapshots, not historical backtest allocations. Price history alone
-cannot establish historical country or sector composition.
+The notebook's regional-context analysis retrieves IMF DataMapper GDP series
+(NGDPD and PPPGDP) and the World Bank WDI market-cap series
+(CM.MKT.LCAP.CD) through public APIs. It uses a fixed 47-country roster
+(23 MSCI World and 24 MSCI Emerging Markets countries) taken from the iShares
+holdings snapshot dated November 25, 2026; those groups are held constant over
+the 2015–2025 GDP trend. The API-based notebook analysis does not read local
+CSV, Excel, or Python source files.
+
+The notebook retrieves the November 25, 2026 holdings from the iShares API,
+verifies the date for each fund and sums equity positions by country of risk
+and sector. It combines the fund exposures using the 70/30 target weights and
+reports them as percentages of portfolio NAV. The tables and charts describe
+a single holdings snapshot after the backtest period.
 
 The IMF GDP comparison and the World Bank/WFE market-cap comparison are
 calculated separately across the country groups; the 70/30 portfolio weights
@@ -136,23 +202,28 @@ equivalent to MSCI free-float-adjusted investable capitalization.
 ## Project files and reproduction
 
 - [`world_em_backtest.ipynb`](./world_em_backtest.ipynb) contains the
-  calculations, performance charts, and regional exhibits.
+  calculations, performance charts, regional comparisons, and dated holdings
+  exposures.
 - [`world_em_backtest.py`](./world_em_backtest.py) contains the main
   backtest logic as a Python script.
 - [`regional_weighting_analysis.py`](./regional_weighting_analysis.py)
-  calculates GDP comparisons and current country and sector exposures.
+  provides separate supplemental country and sector holdings snapshots; it
+  requires the local source files described in the README.
 
-Install the requirements and run the backtest from the project directory:
+Run the notebook from top to bottom in Google Colab or Jupyter. Its setup cell
+installs `yfinance`. The notebook retrieves price, Treasury, GDP, market-cap,
+and iShares holdings data online. To run the standalone backtest script
+locally, install the requirements:
 
 ```bash
 python -m pip install -r requirements.txt
 python world_em_backtest.py
 ```
 
-Run the regional analysis separately with:
+The optional local holdings-snapshot script can be run separately with:
 
 ```bash
 python regional_weighting_analysis.py
 ```
 
-The price and risk-free-rate downloads require an internet connection.
+All notebook API downloads require an internet connection.
