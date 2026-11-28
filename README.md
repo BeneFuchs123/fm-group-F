@@ -51,9 +51,11 @@ through their public APIs and uses a fixed country roster from the dated
 iShares holdings snapshot. The notebook does not read local project data files
 or invoke another project script.
 
-The notebook retrieves URTH and EEM holdings dated November 25, 2026 directly
-from the iShares API and produces country and sector tables and charts for
-the 70/30 target allocation.
+The notebook retrieves URTH, EEM, and ACWI holdings dated November 25, 2026
+directly from the iShares API. It compares the 70/30 target allocation with
+ACWI and MSCI World (URTH) by region, country, and sector, and puts the
+emerging-market allocations alongside IMF GDP and World Bank/WFE market-cap
+shares.
 
 The supplied example notebook uses a different allocation: 50% SSAC.L and 50%
 ACWD.L, with ACWU.L as its benchmark. These are all MSCI ACWI-tracking funds,

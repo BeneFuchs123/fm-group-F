@@ -9,44 +9,48 @@ reproducible presentation of the analysis.
 
 ## Strategy rationale
 
-The strategy combines developed-market equities through URTH (iShares MSCI
-World ETF) with emerging-market equities through EEM (iShares MSCI Emerging
-Markets ETF). The analysis evaluates a fixed 70/30 allocation as a deliberate
-regional balance: it retains a majority allocation to developed markets while
-giving emerging markets a substantial portfolio share. IMF GDP data are used
-to assess the economic context for this target. The allocation is not
-calculated dynamically from GDP or market capitalization, and the analysis
-does not establish that 30% is an optimal allocation.
+We chose a fixed 70% allocation to developed-market equities through URTH
+(iShares MSCI World ETF) and 30% to emerging-market equities through EEM
+(iShares MSCI Emerging Markets ETF). The objective is to reduce US
+concentration relative to the broad global benchmark while keeping most of
+the portfolio invested in developed markets. Annual rebalancing restores
+the intended regional weights.
 
-GDP is used as an economic reference because it measures the scale of
-production, while equity-market capitalization reflects the value of listed
-companies. These measures describe different things: GDP is not itself an
-investable market portfolio, and an economy's GDP share does not determine its
-stock-market return.
+**The benchmark.** The iShares MSCI ACWI ETF covers both developed and
+emerging markets. On November 25, 2026, its holdings included 88.9% developed
+market equities and 10.7% emerging market equities as shares of total fund
+NAV. The rest was about 0.3% before rounding. MSCI World, tracked by URTH,
+covers developed markets and has a 0% emerging-market allocation. Our 30%
+target is about 19 percentage points above the observed ACWI weight.
 
-The IMF comparison uses the 47 countries represented in the current MSCI World
-and MSCI Emerging Markets holdings universe. For 2025, emerging markets
-represented 38.8% of nominal GDP and 57.2% of GDP at purchasing power parity
-(PPP) within that country universe. These figures provide context for a
-30% EM allocation, but they do not produce that allocation exactly. The
-country groups are based on current ETF holdings and are held constant in the
-2015–2025 trend; this is a descriptive comparison, not a historical
-reclassification.
+**The economic context.** Across the fixed 47-country roster, emerging
+markets accounted for 38.8% of 2025 GDP in current US dollars and 57.2% of
+GDP at purchasing power parity (PPP). The PPP measure adjusts for differences
+in price levels across countries. Both measures describe economic production
+and help explain why we wanted meaningful emerging-market exposure. The 30%
+weight is a deliberate allocation choice, and the GDP analysis provides
+context for that choice.
 
-As an additional reference, the 2025 World Bank/World Federation of Exchanges
-market-cap data gives a 28.9% EM share among countries with reported data.
-Coverage is incomplete: values are available for 11 of 23 developed markets
-and 23 of 24 emerging markets. This result is therefore not a robust estimate
-of global investable market capitalization and is not used to set the
-portfolio weights.
+**The market-cap cross-check.** The World Bank and World Federation of
+Exchanges report the market capitalization of listed domestic companies.
+For 2025, we sum the reported values for the countries in each group and
+divide the emerging-market subtotal by the combined total. Approximately
+USD 39.4 trillion divided by USD 136.6 trillion gives 28.9%. Coverage is
+23 of 24 emerging markets and 11 of 23 developed markets. Taiwan, France,
+and the United Kingdom are among the missing observations. The percentage
+describes only the covered countries, whereas ACWI uses the free
+float-adjusted capitalization of eligible securities. We use this figure
+as a secondary comparison. Its proximity to 30% does not establish an
+appropriate allocation.
 
-The current holdings snapshot dated November 25, 2026, shows approximately
-50.9% US exposure in the combined 70/30 portfolio. This is calculated from
-the current country weights of both ETFs and is not a historical exposure
-series. MSCI World is not a US-only index, but its substantial US weight means
-the portfolio remains considerably exposed to the United States. The EM
-allocation broadens regional exposure; it does not create an equal regional
-weighting or remove US concentration.
+**What changes in the portfolio.** At the November 25, 2026 snapshot, US
+equities account for 50.9% of the 70/30 portfolio, 64.8% of ACWI, and 72.7%
+of URTH. Taiwan has an 8.1% weight in the portfolio versus 2.9% in ACWI.
+Information technology remains a large exposure across all three
+(30.4%, 28.5%, and 27.4%, respectively). The main difference is geographic.
+Similar moves are consistent with the strategy and benchmark both holding
+broad equity exposure. The snapshot illustrates the target allocation after
+the backtest sample.
 
 ## Target investors and investment horizon
 
@@ -176,10 +180,11 @@ the 2015–2025 GDP trend. The API-based notebook analysis does not read local
 CSV, Excel, or Python source files.
 
 The notebook retrieves the November 25, 2026 holdings from the iShares API,
-verifies the date for each fund and sums equity positions by country of risk
-and sector. It combines the fund exposures using the 70/30 target weights and
-reports them as percentages of portfolio NAV. The tables and charts describe
-a single holdings snapshot after the backtest period.
+verifies the date for URTH, EEM, and ACWI and sums equity positions by country
+of risk and sector. It compares the 70/30 target portfolio with ACWI and URTH
+using percentages of total NAV. The comparison puts these allocations
+alongside the IMF GDP and World Bank/WFE market capitalization shares. The
+holdings cover a single date after the backtest period.
 
 The IMF GDP comparison and the World Bank/WFE market-cap comparison are
 calculated separately across the country groups; the 70/30 portfolio weights
